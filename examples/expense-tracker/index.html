@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小猪记账</title>
+<style>
+  :root{
+    --pink:#FF8FAB; --pink-deep:#E75A85; --bg:#FFF5F7; --card:#FFFFFF;
+    --gold:#FFC94D; --green:#3FB984; --red:#E5484D; --ink:#4A3B40; --muted:#B79AA3;
+  }
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    margin:0;background:var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:440px;margin:0 auto;padding:16px}
+  .card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:14px;
+    box-shadow:0 6px 20px -8px rgba(231,90,133,.25)}
+  h2{font-size:15px;margin:0 0 12px}
+
+  /* 顶部小猪 */
+  .top{background:linear-gradient(160deg,#FFD1DE,#FF8FAB);border-radius:22px;padding:18px;color:#fff;
+    text-align:center;box-shadow:0 10px 24px -10px rgba(231,90,133,.5);margin-bottom:14px}
+  .top.warn{background:linear-gradient(160deg,#FFE08A,#FFC94D)}
+  .top.over{background:linear-gradient(160deg,#FF9A9A,#E5484D)}
+  .pig{font-size:52px;line-height:1;transition:transform .25s}
+  .pig.bounce{animation:bounce .5s}
+  @keyframes bounce{0%,100%{transform:scale(1)}30%{transform:scale(1.18) translateY(-6px)}60%{transform:scale(.96)}}
+  .mood{font-size:14px;font-weight:600;margin-top:4px;min-height:20px}
+  .nums{display:flex;justify-content:space-around;margin-top:12px;font-size:12px;opacity:.95}
+  .nums b{display:block;font-size:19px;font-weight:800;margin-top:2px}
+  .prog{height:10px;background:rgba(255,255,255,.4);border-radius:99px;margin-top:12px;overflow:hidden}
+  .prog>i{display:block;height:100%;width:0;background:#fff;border-radius:99px;transition:width .4s}
+  .setbtn{margin-top:10px;display:inline-block;background:rgba(255,255,255,.35);border:none;color:#fff;
+    font-family:inherit;font-size:12px;padding:5px 12px;border-radius:99px;cursor:pointer}
+  .setrow{margin-top:10px;display:none;gap:6px;justify-content:center}
+  .setrow.on{display:flex}
+  .setrow input{width:110px;border:none;border-radius:8px;padding:6px 10px;font-family:inherit}
+  .setrow button{border:none;background:#fff;color:var(--pink-deep);font-family:inherit;font-weight:700;
+    border-radius:8px;padding:6px 12px;cursor:pointer}
+
+  /* 记一笔 */
+  input.amt,input.note{width:100%;border:1.5px solid #F3D9E0;background:#fff;border-radius:12px;
+    padding:11px;font-size:15px;font-family:inherit;outline:none}
+  input:focus{border-color:var(--pink)}
+  .hint{color:var(--red);font-size:12px;height:16px;margin:3px 2px}
+  .cats{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 10px}
+  .cat{border:1.5px solid #F3D9E0;background:#fff;color:var(--ink);border-radius:12px;
+    padding:7px 12px;font-size:13px;font-family:inherit;cursor:pointer}
+  .cat.sel{background:var(--pink);border-color:var(--pink);color:#fff;font-weight:600}
+  .row{display:flex;gap:8px}
+  .row .note{flex:1}
+  .add{border:none;background:var(--pink);color:#fff;font-family:inherit;font-size:15px;font-weight:700;
+    padding:11px 20px;border-radius:12px;cursor:pointer;white-space:nowrap}
+  .add:hover{background:var(--pink-deep)}
+
+  /* 统计 */
+  .stat{display:flex;align-items:center;gap:9px;margin:9px 0;font-size:13px}
+  .stat .c{width:34px;color:var(--ink)}
+  .stat .bar{flex:1;height:9px;background:#F6E5EA;border-radius:99px;overflow:hidden}
+  .stat .bar>i{display:block;height:100%;background:var(--pink);border-radius:99px}
+  .stat .v{width:104px;text-align:right;color:var(--muted);font-size:12px}
+
+  /* 账目 */
+  .item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F6E5EA;font-size:14px}
+  .item:last-child{border-bottom:none}
+  .item .meta{font-size:11px;color:var(--muted)}
+  .item .amt2{font-weight:700}
+  .del{border:none;background:none;color:#E0C4CC;font-size:17px;cursor:pointer;margin-left:8px}
+  .del:hover{color:var(--red)}
+  .empty{text-align:center;color:var(--muted);padding:14px 0}
+  .empty .bigpig{font-size:40px}
+
+  /* 投币动画 */
+  .coin{position:fixed;font-size:26px;pointer-events:none;z-index:99;animation:coinup .7s ease-out forwards}
+  @keyframes coinup{0%{opacity:0;transform:translateY(0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translateY(-120px) scale(1.1)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 顶部小猪 + 预算 -->
+  <div class="top" id="top">
+    <div class="pig" id="pig">🐷</div>
+    <div class="mood" id="mood"></div>
+    <div class="nums">
+      <div>已花<b id="spent">0</b></div>
+      <div>预算<b id="budget">0</b></div>
+      <div>结余<b id="left">0</b></div>
+    </div>
+    <div class="prog"><i id="prog"></i></div>
+    <button class="setbtn" id="setbtn">设预算</button>
+    <div class="setrow" id="setrow">
+      <input id="budgetInput" type="number" placeholder="每月预算">
+      <button id="budgetSave">存</button>
+    </div>
+  </div>
+
+  <!-- 记一笔 -->
+  <div class="card">
+    <h2>记一笔</h2>
+    <input class="amt" id="amount" type="number" placeholder="花了多少钱?">
+    <div class="hint" id="hint"></div>
+    <div class="cats" id="cats"></div>
+    <div class="row">
+      <input class="note" id="note" type="text" placeholder="备注(可不填)">
+      <button class="add" id="add">记一笔</button>
+    </div>
+  </div>
+
+  <!-- 钱花哪了 -->
+  <div class="card">
+    <h2>钱花哪了</h2>
+    <div id="stats"></div>
+  </div>
+
+  <!-- 账目 -->
+  <div class="card">
+    <h2>账目</h2>
+    <div id="list"></div>
+  </div>
+
+</div>
+
+<script>
+  const CATS = ['餐饮','交通','购物','娱乐','居家','房租','通讯','医疗','人情','旅行','其他'];
+  let items = JSON.parse(localStorage.getItem('pig_items') || '[]');
+  let budget = Number(localStorage.getItem('pig_budget') || 0);
+  let curCat = CATS[0];
+
+  const $ = id => document.getElementById(id);
+
+  // 分类按钮
+  CATS.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'cat' + (i === 0 ? ' sel' : '');
+    b.textContent = c;
+    b.onclick = () => { curCat = c; [...$('cats').children].forEach(x => x.classList.remove('sel')); b.classList.add('sel'); };
+    $('cats').appendChild(b);
+  });
+
+  // 设预算
+  $('setbtn').onclick = () => { $('setrow').classList.toggle('on'); $('budgetInput').value = budget || ''; };
+  $('budgetSave').onclick = () => {
+    const v = Number($('budgetInput').value);
+    if (v > 0) { budget = v; localStorage.setItem('pig_budget', budget); $('setrow').classList.remove('on'); render(); }
+  };
+
+  // 记一笔
+  $('add').onclick = () => {
+    const amount = Number($('amount').value);
+    if (!amount || amount <= 0) { $('hint').textContent = '填个大于 0 的金额哦'; return; }
+    $('hint').textContent = '';
+    items.push({ amount, cat: curCat, note: $('note').value.trim(), time: Date.now() });
+    save(); $('amount').value = ''; $('note').value = '';
+    coinFly(); $('pig').classList.add('bounce'); setTimeout(() => $('pig').classList.remove('bounce'), 500);
+    render();
+  };
+
+  function save() { localStorage.setItem('pig_items', JSON.stringify(items)); }
+
+  // 投币动画:金币从按钮飞向小猪
+  function coinFly() {
+    const btn = $('add').getBoundingClientRect();
+    const coin = document.createElement('div');
+    coin.className = 'coin'; coin.textContent = '🪙';
+    coin.style.left = (btn.left + btn.width / 2 - 13) + 'px';
+    coin.style.top = (btn.top - 10) + 'px';
+    document.body.appendChild(coin);
+    setTimeout(() => coin.remove(), 750);
+  }
+
+  function fmtTime(t) {
+    const d = new Date(t), p = n => String(n).padStart(2, '0');
+    return (d.getMonth() + 1) + '-' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function render() {
+    const spent = items.reduce((s, it) => s + it.amount, 0);
+    const left = budget - spent;
+    $('spent').textContent = spent;
+    $('budget').textContent = budget || '--';
+    $('left').textContent = budget ? left : '--';
+
+    // 小猪心情:按已花/预算
+    const top = $('top'); top.className = 'top';
+    let mood = '记一笔,喂喂小猪吧~';
+    if (budget > 0) {
+      const r = spent / budget;
+      $('prog').style.width = Math.min(100, r * 100) + '%';
+      if (r > 1) { top.classList.add('over'); mood = '超支啦!小猪哭了 😭'; $('pig').textContent = '🐷'; }
+      else if (r >= 0.8) { top.classList.add('warn'); mood = '悠着点花,快到预算了 😰'; }
+      else { mood = '攒得不错,继续保持~ 🥰'; }
+    } else { $('prog').style.width = '0%'; mood = '先点"设预算",定个小目标吧'; }
+    $('mood').textContent = mood;
+
+    // 钱花哪了
+    const stats = $('stats');
+    if (items.length === 0) {
+      stats.innerHTML = '<div class="empty"><div class="bigpig">🐷</div>还没记账,喂我第一笔吧~</div>';
+    } else {
+      const byCat = {};
+      items.forEach(it => byCat[it.cat] = (byCat[it.cat] || 0) + it.amount);
+      const rows = Object.keys(byCat).map(c => [c, byCat[c]]).sort((a, b) => b[1] - a[1]);
+      stats.innerHTML = '';
+      rows.forEach(([cat, amt]) => {
+        const pct = Math.round(amt / spent * 100);
+        const d = document.createElement('div'); d.className = 'stat';
+        d.innerHTML = '<span class="c"></span><span class="bar"><i></i></span><span class="v"></span>';
+        d.querySelector('.c').textContent = cat;
+        d.querySelector('.bar i').style.width = pct + '%';
+        d.querySelector('.v').textContent = '¥' + amt + ' · ' + pct + '%';
+        stats.appendChild(d);
+      });
+    }
+
+    // 账目
+    const list = $('list');
+    if (items.length === 0) {
+      list.innerHTML = '<div class="empty">这里会列出你记的每一笔</div>';
+    } else {
+      list.innerHTML = '';
+      items.slice().reverse().forEach((it) => {
+        const realIdx = items.indexOf(it);
+        const row = document.createElement('div'); row.className = 'item';
+        const meta = fmtTime(it.time) + (it.note ? ' · ' + it.note : '');
+        row.innerHTML = '<div><div class="cat-name"></div><div class="meta"></div></div><div><span class="amt2"></span><button class="del">x</button></div>';
+        row.querySelector('.cat-name').textContent = it.cat;
+        row.querySelector('.meta').textContent = meta;
+        row.querySelector('.amt2').textContent = '¥' + it.amount;
+        row.querySelector('.del').onclick = () => { items.splice(realIdx, 1); save(); render(); };
+        list.appendChild(row);
+      });
+    }
+  }
+
+  render();
+</script>
+</body>
+</html>

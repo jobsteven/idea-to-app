@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>记账 App - 低保真线框</title>
+<style>
+  /* 低保真线框:全灰阶,只看结构和位置,不上色、不美化 */
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#fafafa;color:#333;margin:0;padding:20px}
+  .note{max-width:420px;margin:0 auto 12px;font-size:12px;color:#999;text-align:center}
+  .screen{max-width:420px;margin:0 auto;background:#fff;border:1px solid #ccc}
+  .block{border-bottom:1px dashed #ccc;padding:14px 16px}
+  .block:last-child{border-bottom:none}
+  .tag{font-size:11px;color:#aaa;letter-spacing:1px;margin-bottom:8px}
+  /* 顶部 */
+  .toprow{display:flex;justify-content:space-between;align-items:baseline}
+  .big{font-size:26px;color:#555}
+  .btn{border:1px solid #999;background:#eee;color:#555;padding:5px 10px;font-size:12px;border-radius:4px}
+  .prog{height:10px;background:#eee;border:1px solid #ccc;border-radius:99px;margin-top:10px;overflow:hidden}
+  .prog>i{display:block;height:100%;width:55%;background:#bbb}
+  /* 输入占位 */
+  .ph{border:1px solid #ccc;background:#f3f3f3;color:#999;padding:9px 10px;border-radius:4px;font-size:13px}
+  .cats{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+  .cat{border:1px solid #ccc;background:#f3f3f3;color:#666;padding:6px 10px;border-radius:4px;font-size:12px}
+  .rowline{display:flex;gap:8px;margin-top:10px;align-items:center}
+  .rowline .ph{flex:1}
+  /* 统计条 */
+  .stat{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:13px;color:#555}
+  .stat .c{width:36px}
+  .stat .bar{flex:1;height:9px;background:#eee;border:1px solid #ddd;border-radius:99px;overflow:hidden}
+  .stat .bar>i{display:block;height:100%;background:#bbb}
+  .stat .v{width:96px;text-align:right;color:#888;font-size:12px}
+  /* 账目 */
+  .item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+  .item .meta{font-size:11px;color:#aaa}
+  .item .amt{color:#555;font-weight:600}
+  .x{color:#bbb;margin-left:8px}
+</style>
+</head>
+<body>
+  <div class="note">低保真线框 · 只定结构和位置,颜色/美观等第 4 步(风格)再说</div>
+  <div class="screen">
+
+    <!-- 1. 顶部:已花 / 预算 / 进度 -->
+    <div class="block">
+      <div class="tag">顶部 · 本月概况</div>
+      <div class="toprow">
+        <div>本月已花<br><span class="big">¥2,750</span></div>
+        <div style="text-align:right">预算 ¥5,000<br><span class="btn">设预算</span></div>
+      </div>
+      <div class="prog"><i></i></div>
+    </div>
+
+    <!-- 2. 记一笔 -->
+    <div class="block">
+      <div class="tag">记一笔</div>
+      <div class="ph">金额:多少钱?</div>
+      <div class="cats">
+        <span class="cat">餐饮</span><span class="cat">交通</span><span class="cat">购物</span>
+        <span class="cat">娱乐</span><span class="cat">居家</span><span class="cat">房租</span>
+        <span class="cat">通讯</span><span class="cat">医疗</span><span class="cat">人情</span>
+        <span class="cat">旅行</span><span class="cat">其他</span>
+      </div>
+      <div class="rowline"><span class="ph">备注(可不填)</span><span class="btn">记一笔</span></div>
+    </div>
+
+    <!-- 3. 钱花哪了 -->
+    <div class="block">
+      <div class="tag">钱花哪了 · 按分类</div>
+      <div class="stat"><span class="c">餐饮</span><span class="bar"><i style="width:70%"></i></span><span class="v">¥1,200 · 44%</span></div>
+      <div class="stat"><span class="c">购物</span><span class="bar"><i style="width:45%"></i></span><span class="v">¥760 · 28%</span></div>
+      <div class="stat"><span class="c">交通</span><span class="bar"><i style="width:20%"></i></span><span class="v">¥340 · 12%</span></div>
+      <div class="stat"><span class="c">其他</span><span class="bar"><i style="width:12%"></i></span><span class="v">¥450 · 16%</span></div>
+    </div>
+
+    <!-- 4. 账目 -->
+    <div class="block">
+      <div class="tag">账目 · 每一笔</div>
+      <div class="item"><div>餐饮<div class="meta">7-1 12:30 · 午饭</div></div><div><span class="amt">¥35</span><span class="x">x</span></div></div>
+      <div class="item"><div>购物<div class="meta">6-30 18:00 · 买鞋</div></div><div><span class="amt">¥320</span><span class="x">x</span></div></div>
+      <div class="item"><div>交通<div class="meta">6-30 08:10 · 地铁</div></div><div><span class="amt">¥8</span><span class="x">x</span></div></div>
+    </div>
+
+  </div>
+</body>
+</html>
