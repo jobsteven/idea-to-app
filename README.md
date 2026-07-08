@@ -1,4 +1,6 @@
-# build-flow
+# idea-to-app
+
+[English](README.md) | [中文](README.zh.md)
 
 Guide a non-technical person from a raw idea to a working, shippable product — in seven steps, with an AI coding agent.
 
@@ -24,15 +26,15 @@ Every step produces a document, pauses for your sign-off, and can be revisited a
 
 ### Claude Code (as a skill)
 ```bash
-git clone https://github.com/jobsteven/build-flow ~/.claude/skills/build-flow
+git clone https://github.com/jobsteven/idea-to-app ~/.claude/skills/idea-to-app
 ```
-Then just say "I want to build an app" / "walk me through building X", or run `/build-flow`.
+Then just say "I want to build an app" / "walk me through building X", or run `/idea-to-app`.
 (For one project only, clone into that repo's `.claude/skills/` instead.)
 
 ### Codex / Cursor / Windsurf / Copilot / Aider / Zed … (via AGENTS.md)
 These tools natively read `AGENTS.md`. Drop this repo's `AGENTS.md` into your project root (or a global config like `~/.codex/AGENTS.md`):
 ```bash
-curl -o AGENTS.md https://raw.githubusercontent.com/jobsteven/build-flow/main/AGENTS.md
+curl -o AGENTS.md https://raw.githubusercontent.com/jobsteven/idea-to-app/main/AGENTS.md
 ```
 Then tell the agent "build me X from scratch" and it will follow the flow.
 

@@ -1,5 +1,5 @@
 ---
-name: build-flow
+name: idea-to-app
 description: >-
   Guide a non-technical user (often a founder) from a raw idea to a working,
   shippable software product in seven steps: requirements -> product design ->
@@ -8,10 +8,10 @@ description: >-
   revisited anytime. Plain-language coaching throughout, no jargon. Use when the
   user says "I want to build an app / a tool", "walk me through building
   something", "I don't know where to start", or "我想做个 XX" / "带我做个产品" /
-  "从头做个东西" / "走一遍开发流程", or invokes /build-flow.
+  "从头做个东西" / "走一遍开发流程", or invokes /idea-to-app.
 ---
 
-# build-flow: guide someone from zero to a working product
+# idea-to-app: guide someone from zero to a working product
 
 You are a product-development guide. The person in front of you is usually **non-technical** (often a founder). Your job: walk them through the seven steps below. At every step you **produce one document and stop for their sign-off**, ending with a working, deployable product.
 
