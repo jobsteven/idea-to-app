@@ -1,0 +1,480 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>番茄钟</title>
+<style>
+  :root {
+    --bg: #0e0f13;
+    --panel: #16181f;
+    --panel-edge: #23262f;
+    --ink: #f4f5f7;
+    --ink-dim: #9aa0ab;
+    --ink-faint: #5c626e;
+    --track: #23262f;
+    --focus: #ff6b57;
+    --focus-soft: rgba(255, 107, 87, 0.14);
+    --break: #57c8a3;
+    --break-soft: rgba(87, 200, 163, 0.14);
+    --accent: var(--focus);
+    --accent-soft: var(--focus-soft);
+    --shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; }
+
+  body {
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(255, 107, 87, 0.08), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    min-height: 100dvh;
+    transition: background 0.6s ease;
+  }
+
+  body.mode-break {
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(87, 200, 163, 0.08), transparent 55%),
+      var(--bg);
+  }
+
+  .app {
+    width: 100%;
+    max-width: 390px;
+    min-height: 100dvh;
+    background: linear-gradient(180deg, #14161d 0%, #0f1015 100%);
+    border-left: 1px solid var(--panel-edge);
+    border-right: 1px solid var(--panel-edge);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    padding: calc(env(safe-area-inset-top) + 26px) 26px calc(env(safe-area-inset-bottom) + 30px);
+  }
+
+  /* header */
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .brand .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    transition: background 0.5s ease, box-shadow 0.5s ease;
+  }
+  .today {
+    font-size: 12px;
+    color: var(--ink-dim);
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    padding: 6px 11px;
+    border-radius: 999px;
+  }
+  .today b { color: var(--ink); font-weight: 600; }
+
+  /* mode switch */
+  .modes {
+    margin-top: 26px;
+    display: flex;
+    gap: 4px;
+    background: var(--panel);
+    border: 1px solid var(--panel-edge);
+    border-radius: 14px;
+    padding: 4px;
+  }
+  .modes button {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    color: var(--ink-dim);
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: inherit;
+    padding: 9px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: color 0.25s ease, background 0.25s ease;
+  }
+  .modes button.on {
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  /* ring */
+  .stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .ring-wrap {
+    position: relative;
+    width: 288px;
+    height: 288px;
+  }
+  svg.ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .track { stroke: var(--track); }
+  .ring .prog {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.9s linear, stroke 0.5s ease;
+    filter: drop-shadow(0 0 10px var(--accent-soft));
+  }
+
+  .readout {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .phase {
+    font-size: 12.5px;
+    letter-spacing: 0.22em;
+    color: var(--ink-dim);
+    text-transform: none;
+  }
+  .time {
+    font-size: 66px;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    line-height: 1;
+  }
+  .hint {
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    min-height: 16px;
+  }
+
+  /* controls */
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .btn {
+    font-family: inherit;
+    border: 1px solid var(--panel-edge);
+    background: var(--panel);
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.12s ease, background 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
+  }
+  .btn:active { transform: scale(0.94); }
+  .btn.ghost {
+    width: 54px; height: 54px; border-radius: 50%;
+    color: var(--ink-dim);
+  }
+  .btn.primary {
+    width: 84px; height: 84px; border-radius: 50%;
+    background: var(--accent);
+    border-color: transparent;
+    color: #12131a;
+    box-shadow: 0 14px 34px -12px var(--accent);
+  }
+  .btn.primary .label {
+    font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
+  }
+  .btn svg { width: 26px; height: 26px; }
+
+  .foot {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body, .btn, .prog, .modes button, .brand .dot { transition: none !important; }
+    .btn:active { transform: none; }
+  }
+</style>
+
+<div class="app" id="app">
+  <div class="head">
+    <div class="brand"><span class="dot"></span>番茄钟</div>
+    <div class="today">今日已完成 <b id="count">0</b> 个</div>
+  </div>
+
+  <div class="modes">
+    <button id="mFocus" class="on" type="button">专注</button>
+    <button id="mBreak" type="button">休息</button>
+  </div>
+
+  <div class="stage">
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 260 260" aria-hidden="true">
+        <circle class="track" cx="130" cy="130" r="120" fill="none" stroke-width="12"></circle>
+        <circle class="prog" id="prog" cx="130" cy="130" r="120" fill="none" stroke-width="12"></circle>
+      </svg>
+      <div class="readout">
+        <div class="phase" id="phase">专注时间</div>
+        <div class="time" id="time">25:00</div>
+        <div class="hint" id="hint">静下来，专注一件事</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn ghost" id="reset" type="button" aria-label="重置">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path>
+      </svg>
+    </button>
+    <button class="btn primary" id="toggle" type="button">
+      <span class="label" id="toggleLabel">开始</span>
+    </button>
+    <button class="btn ghost" id="skip" type="button" aria-label="跳到下一段">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 5v14l9-7z"></path><path d="M19 5v14"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="foot">专注 25 分钟 / 休息 5 分钟</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DUR = { focus: 25 * 60 * 1000, break: 5 * 60 * 1000 };
+  var CIRC = 2 * Math.PI * 120; // ring circumference
+
+  var el = {
+    body: document.body,
+    prog: document.getElementById("prog"),
+    time: document.getElementById("time"),
+    phase: document.getElementById("phase"),
+    hint: document.getElementById("hint"),
+    count: document.getElementById("count"),
+    toggle: document.getElementById("toggle"),
+    toggleLabel: document.getElementById("toggleLabel"),
+    reset: document.getElementById("reset"),
+    skip: document.getElementById("skip"),
+    mFocus: document.getElementById("mFocus"),
+    mBreak: document.getElementById("mBreak")
+  };
+
+  el.prog.style.strokeDasharray = CIRC;
+
+  // ---- state ----
+  var mode = "focus";       // "focus" | "break"
+  var running = false;
+  var endAt = 0;            // timestamp when current run finishes
+  var remaining = DUR.focus; // ms left while paused
+  var ticker = null;
+
+  // ---- persistence: today's completed pomodoros ----
+  var STORE_KEY = "pomodoro.daily.v1";
+
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
+  function loadCount() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return 0;
+      var obj = JSON.parse(raw);
+      return obj && obj.date === todayKey() ? (obj.count || 0) : 0;
+    } catch (e) { return 0; }
+  }
+  function saveCount(n) {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ date: todayKey(), count: n }));
+    } catch (e) { /* storage unavailable, keep running in-memory */ }
+  }
+  var doneToday = loadCount();
+
+  // ---- rendering ----
+  function fmt(ms) {
+    var total = Math.max(0, Math.round(ms / 1000));
+    var m = Math.floor(total / 60);
+    var s = total % 60;
+    return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function applyTheme() {
+    var accent = mode === "focus" ? "var(--focus)" : "var(--break)";
+    var soft = mode === "focus" ? "var(--focus-soft)" : "var(--break-soft)";
+    document.documentElement.style.setProperty("--accent", accent);
+    document.documentElement.style.setProperty("--accent-soft", soft);
+    el.body.classList.toggle("mode-break", mode === "break");
+    el.mFocus.classList.toggle("on", mode === "focus");
+    el.mBreak.classList.toggle("on", mode === "break");
+    el.phase.textContent = mode === "focus" ? "专注时间" : "休息一下";
+  }
+
+  function render() {
+    el.time.textContent = fmt(remaining);
+    var frac = remaining / DUR[mode];      // 1 -> full, 0 -> empty
+    if (frac < 0) frac = 0; if (frac > 1) frac = 1;
+    el.prog.style.strokeDashoffset = CIRC * (1 - frac);
+    el.count.textContent = doneToday;
+    el.toggleLabel.textContent = running ? "暂停" : "开始";
+    if (!running) {
+      el.hint.textContent = remaining === DUR[mode]
+        ? (mode === "focus" ? "静下来，专注一件事" : "起来走走，喝口水")
+        : "已暂停";
+    } else {
+      el.hint.textContent = mode === "focus" ? "专注中，别分心" : "放松，马上回来";
+    }
+  }
+
+  // ---- ticking (timestamp-based, background-safe) ----
+  function tick() {
+    remaining = endAt - Date.now();
+    if (remaining <= 0) {
+      remaining = 0;
+      render();
+      complete();
+      return;
+    }
+    render();
+  }
+
+  function start() {
+    if (running) return;
+    running = true;
+    endAt = Date.now() + remaining;
+    clearInterval(ticker);
+    ticker = setInterval(tick, 250);
+    render();
+  }
+
+  function pause() {
+    if (!running) return;
+    running = false;
+    remaining = Math.max(0, endAt - Date.now());
+    clearInterval(ticker);
+    render();
+  }
+
+  function reset() {
+    running = false;
+    clearInterval(ticker);
+    remaining = DUR[mode];
+    render();
+  }
+
+  function setMode(next, keepRunning) {
+    mode = next;
+    remaining = DUR[mode];
+    applyTheme();
+    if (keepRunning) { running = false; start(); }
+    else { running = false; clearInterval(ticker); }
+    render();
+  }
+
+  function complete() {
+    clearInterval(ticker);
+    running = false;
+    if (mode === "focus") {
+      doneToday += 1;
+      saveCount(doneToday);
+      notify("一轮专注完成", "去休息 5 分钟吧");
+      flash();
+      setMode("break", true);   // auto-flow into break and keep going
+    } else {
+      notify("休息结束", "回到专注，继续下一颗番茄");
+      flash();
+      setMode("focus", false);  // stop, let user choose to start
+    }
+  }
+
+  // ---- feedback ----
+  function flash() {
+    beep();
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.prog.animate(
+        [{ opacity: 1 }, { opacity: 0.25 }, { opacity: 1 }],
+        { duration: 700, iterations: 2 }
+      );
+    }
+  }
+
+  function notify(title, body) {
+    try {
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body: body, silent: true });
+      }
+    } catch (e) { /* notifications optional */ }
+  }
+
+  var audioCtx = null;
+  function beep() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      var t = audioCtx.currentTime;
+      [660, 880].forEach(function (freq, i) {
+        var o = audioCtx.createOscillator();
+        var g = audioCtx.createGain();
+        o.type = "sine";
+        o.frequency.value = freq;
+        o.connect(g); g.connect(audioCtx.destination);
+        var s = t + i * 0.18;
+        g.gain.setValueAtTime(0, s);
+        g.gain.linearRampToValueAtTime(0.18, s + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, s + 0.16);
+        o.start(s); o.stop(s + 0.18);
+      });
+    } catch (e) { /* audio optional */ }
+  }
+
+  // ---- events ----
+  el.toggle.addEventListener("click", function () {
+    if (running) pause();
+    else {
+      start();
+      try { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); } catch (e) {}
+    }
+  });
+  el.reset.addEventListener("click", reset);
+  el.skip.addEventListener("click", function () {
+    setMode(mode === "focus" ? "break" : "focus", false);
+  });
+  el.mFocus.addEventListener("click", function () { if (mode !== "focus") setMode("focus", false); });
+  el.mBreak.addEventListener("click", function () { if (mode !== "break") setMode("break", false); });
+
+  // keep display honest when returning from background
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && running) tick();
+  });
+
+  // roll count over if the day changed while the tab stayed open
+  window.addEventListener("focus", function () {
+    var fresh = loadCount();
+    if (fresh !== doneToday) { doneToday = fresh; render(); }
+  });
+
+  // ---- init ----
+  applyTheme();
+  render();
+})();
+</script>

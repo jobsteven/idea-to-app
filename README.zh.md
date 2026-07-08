@@ -2,11 +2,26 @@
 
 [English](README.md) | [中文](README.zh.md)
 
-带一个不懂技术的人,用 AI 把脑子里的想法,七步做成一个能用、能上线的产品。
+你有个 App 的点子,但不会写代码。放在以前,这事到这儿就断了。
 
-一套流程、两种壳,几乎所有 AI 编程工具都能装:给 Claude Code 的 **`SKILL.md`**,和给其余工具(Codex、Cursor、Windsurf、Copilot、Aider、Zed 等 20 多种)的 **`AGENTS.md`**。同一套内容,一个源头。
+**idea-to-app** 是一个 skill,用大白话带你从这个点子出发,七步做出一个能用、能上线的 App——打字的活交给 AI,拿主意的一直是你。走完,手里有个真东西,外加一整套记录你怎么做出来的文档。
 
-为想**自己做主**的创业者、产品经理、新手准备:每个决定你拍板,打字交给 AI,走完手里有一个真东西,外加一整套过程文档。
+在 Claude Code 里当 `SKILL.md` 用;其他读 `AGENTS.md` 的工具(Codex、Cursor、Windsurf、Copilot、Aider、Zed 等 20 多种)也认。一套流程,一个源头。
+
+## 都是照这套流程做出来的
+
+四个小 App,每个都从头到尾走了一遍 idea-to-app。全是单文件、双击就开、数据存在浏览器里。
+
+<table>
+<tr>
+<td align="center" width="25%"><img src="examples/expense-tracker/screenshot.png" width="190"><br><b>记账</b><br><sub>小猪存钱罐记账,超支了小猪会哭</sub></td>
+<td align="center" width="25%"><img src="examples/habit-tracker/screenshot.png" width="190"><br><b>习惯打卡</b><br><sub>每天打卡,连续多少天一眼点亮</sub></td>
+<td align="center" width="25%"><img src="examples/mood-journal/screenshot.png" width="190"><br><b>心情日记</b><br><sub>每天一个表情一句话,月底看情绪起伏</sub></td>
+<td align="center" width="25%"><img src="examples/pomodoro/screenshot.png" width="190"><br><b>番茄钟</b><br><sub>一个大圈,专注 25 分钟,别的没了</sub></td>
+</tr>
+</table>
+
+记账那个还附了全套过程文档 [`examples/expense-tracker/docs/`](examples/expense-tracker/docs)——七步一路产出的六份文档,从头翻一遍就知道每步到底出什么。
 
 ## 七步
 
@@ -20,34 +35,21 @@
 | 6. 开发预览 | 产品本身 |
 | 7. 部署上线 | `docs/06-deploy.md` |
 
-每一步都产出一份文档、停下来等你确认、随时能回头改。全程大白话,不甩术语。
+每一步写一份文档、停下来等你点头、随时能回头改。全程没有术语。
 
 ## 安装
 
-### Claude Code(作为 skill)
+**Claude Code** —— 克隆到你的 skills 文件夹,然后说"我想做个 App"或输入 `/idea-to-app`:
 ```bash
 git clone https://github.com/jobsteven/idea-to-app ~/.claude/skills/idea-to-app
 ```
-然后说一句"我想做个 XX""带我做个产品",或直接 `/idea-to-app` 就能触发。
-(只想用在某一个项目里,就克隆到那个项目的 `.claude/skills/` 下。)
 
-### Codex / Cursor / Windsurf / Copilot / Aider / Zed ……(用 AGENTS.md)
-这些工具都认 `AGENTS.md`。把本仓库的 `AGENTS.md` 丢到你项目根目录(或全局配置,如 `~/.codex/AGENTS.md`):
+**Codex、Cursor、Windsurf 等读 AGENTS.md 的工具** —— 把流程丢进项目根目录:
 ```bash
 curl -o AGENTS.md https://raw.githubusercontent.com/jobsteven/idea-to-app/main/AGENTS.md
 ```
-然后跟它说"从头帮我做个 XX",它就会照着流程走。
 
-### 其他任何 agent
-把 `AGENTS.md` 的内容贴进那个工具的自定义指令/规则里,或开工时当 prompt 发给它。
-
-## 看看效果
-
-`examples/expense-tracker/` 是照着这套流程真跑一遍做出来的:
-- `index.html` —— 一个小猪存钱罐记账 App(双击就能用,数据存在浏览器里,刷新不丢)。
-- `docs/01`–`06` —— 七步一路产出的那几份文档,原样都在。
-
-从头翻一遍那些文档,就能看清每一步到底产出什么。
+**其他任何 agent** —— 把 `AGENTS.md` 贴进那个工具的自定义指令,或开工时当 prompt 发给它。
 
 ## 许可
 

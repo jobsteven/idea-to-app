@@ -1,0 +1,552 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>心情日记</title>
+<style>
+  :root {
+    /* 五种心情配色 */
+    --m5:  #F2A65A;  /* 很好 - 暖橙 */
+    --m5b: #FFF1E2;
+    --m4:  #7FB77E;  /* 好   - 柔绿 */
+    --m4b: #EBF4EA;
+    --m3:  #E8C468;  /* 一般 - 淡金 */
+    --m3b: #FBF4E0;
+    --m2:  #7EA6D8;  /* 低落 - 雾蓝 */
+    --m2b: #E9F0FA;
+    --m1:  #B08BC2;  /* 很差 - 柔紫 */
+    --m1b: #F1E9F5;
+
+    --ink:      #4A4340;
+    --ink-soft: #8C837D;
+    --ink-faint:#B8AFA8;
+    --card:     #FFFFFF;
+    --line:     #F0EAE4;
+    --shadow:   0 10px 30px -12px rgba(122, 96, 70, .28);
+    --shadow-sm:0 4px 14px -6px rgba(122, 96, 70, .22);
+    --radius:   26px;
+    --radius-sm:18px;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    background: linear-gradient(165deg, #FDF6EF 0%, #F7EEF6 52%, #EDF2F9 100%);
+    display: flex;
+    justify-content: center;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 手机竖屏容器,桌面居中为手机宽度 */
+  .phone {
+    width: 100%;
+    max-width: 402px;
+    min-height: 100vh;
+    padding: calc(env(safe-area-inset-top) + 22px) 20px calc(env(safe-area-inset-bottom) + 40px);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* 头部 */
+  .top { padding: 4px 4px 0; }
+  .top .greeting { font-size: 15px; color: var(--ink-soft); font-weight: 500; }
+  .top h1 { margin: 3px 0 0; font-size: 27px; font-weight: 800; letter-spacing: .3px; }
+  .top h1 .spark { font-size: 22px; }
+
+  /* 卡片通用 */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 20px;
+  }
+  .card h2 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 800;
+  }
+  .card .sub { margin: 0 0 16px; font-size: 13px; color: var(--ink-soft); }
+
+  /* 心情概览 */
+  .overview .strip {
+    display: flex;
+    gap: 5px;
+    align-items: flex-end;
+    height: 34px;
+  }
+  .overview .cell {
+    flex: 1;
+    height: 100%;
+    border-radius: 7px;
+    background: var(--line);
+    transition: transform .2s ease;
+  }
+  .overview .cell.filled { box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+  .overview .cell.today {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor;
+  }
+  .overview .legend {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+
+  /* 心情选择 */
+  .picker { display: flex; justify-content: space-between; gap: 8px; }
+  .mood {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 0 6px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    transition: background .2s, transform .15s;
+  }
+  .mood:active { transform: scale(.94); }
+  .mood .face {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    background: var(--bg);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .mood .name { font-size: 12px; color: var(--ink-soft); font-weight: 600; }
+  .mood.on { background: var(--bg); }
+  .mood.on .face {
+    transform: scale(1.06);
+    box-shadow: 0 6px 16px -6px var(--col);
+    background: #fff;
+  }
+  .mood.on .name { color: var(--col); font-weight: 800; }
+
+  /* 输入框 */
+  .note-wrap { margin-top: 18px; position: relative; }
+  textarea {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px 15px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.6;
+    resize: none;
+    background: #FDFBF9;
+    transition: border-color .2s, background .2s;
+    outline: none;
+  }
+  textarea::placeholder { color: var(--ink-faint); }
+  textarea:focus { border-color: var(--focus, #E0C9B0); background: #fff; }
+
+  .save {
+    margin-top: 14px;
+    width: 100%;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: inherit;
+    color: #fff;
+    background: linear-gradient(135deg, #E9A96A, #D98CB0);
+    box-shadow: 0 10px 22px -10px rgba(217,140,176,.9);
+    cursor: pointer;
+    transition: transform .15s, opacity .2s, box-shadow .2s;
+  }
+  .save:active { transform: scale(.97); }
+  .save:disabled {
+    background: #EFE7E0;
+    color: var(--ink-faint);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .saved-tip {
+    text-align: center;
+    font-size: 13px;
+    color: var(--m4);
+    font-weight: 700;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: opacity .3s, height .3s, margin .3s;
+  }
+  .saved-tip.show { height: 18px; opacity: 1; margin-top: 12px; }
+
+  /* 历史 */
+  .history-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 4px 6px 0;
+  }
+  .history-head h2 { margin: 0; font-size: 17px; font-weight: 800; }
+  .history-head .count { font-size: 13px; color: var(--ink-faint); }
+
+  .list { display: flex; flex-direction: column; gap: 12px; }
+
+  .entry {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    padding: 15px 16px;
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    position: relative;
+    animation: pop .3s ease;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .entry .dot {
+    width: 40px; height: 40px; flex: none;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 21px;
+  }
+  .entry .body { flex: 1; min-width: 0; padding-top: 1px; }
+  .entry .meta {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+  .entry .date { font-size: 13px; font-weight: 800; color: var(--ink); }
+  .entry .tag {
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 999px;
+  }
+  .entry .text {
+    font-size: 14px; line-height: 1.6; color: var(--ink-soft);
+    word-break: break-word; white-space: pre-wrap;
+  }
+  .entry .text.empty { color: var(--ink-faint); font-style: normal; }
+  .entry .del {
+    position: absolute; top: 10px; right: 10px;
+    border: none; background: transparent;
+    color: var(--ink-faint); font-size: 18px; line-height: 1;
+    width: 26px; height: 26px; border-radius: 50%;
+    cursor: pointer; opacity: .5;
+    transition: opacity .2s, background .2s;
+  }
+  .entry .del:active { background: var(--line); opacity: 1; }
+
+  /* 空状态 */
+  .empty-state {
+    text-align: center;
+    padding: 30px 20px 34px;
+  }
+  .empty-state .emoji { font-size: 46px; }
+  .empty-state .t1 { margin: 12px 0 5px; font-size: 16px; font-weight: 800; }
+  .empty-state .t2 { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-faint);
+    padding: 6px 0 0;
+    letter-spacing: .3px;
+  }
+</style>
+
+<div class="phone">
+  <div class="top">
+    <div class="greeting" id="greeting">很高兴又见到你</div>
+    <h1><span class="spark">🌤️</span> 心情日记</h1>
+  </div>
+
+  <!-- 本月概览 -->
+  <div class="card overview">
+    <h2>本月心情概览</h2>
+    <p class="sub" id="ovSub">这个月的每一天,都被温柔记着</p>
+    <div class="strip" id="strip"></div>
+    <div class="legend">
+      <span id="ovStart">月初</span>
+      <span id="ovEnd">今天</span>
+    </div>
+  </div>
+
+  <!-- 今日记录 -->
+  <div class="card">
+    <h2 id="todayTitle">今天感觉怎么样?</h2>
+    <p class="sub" id="todayDate"></p>
+    <div class="picker" id="picker"></div>
+    <div class="note-wrap">
+      <textarea id="note" rows="3" placeholder="想写点什么?一句话就好~"></textarea>
+    </div>
+    <button class="save" id="saveBtn" disabled>先选一个心情吧</button>
+    <div class="saved-tip" id="savedTip">已经记下啦,明天见 💛</div>
+  </div>
+
+  <!-- 历史 -->
+  <div class="history-head">
+    <h2>心情足迹</h2>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="list" id="list"></div>
+
+  <div class="footer">每天一点点,陪你看见自己 · 数据只存在这台设备</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var MOODS = [
+    { key: "great", score: 5, name: "很好", emoji: "😄", col: "var(--m5)", bg: "var(--m5b)", hex: "#F2A65A" },
+    { key: "good",  score: 4, name: "好",   emoji: "🙂", col: "var(--m4)", bg: "var(--m4b)", hex: "#7FB77E" },
+    { key: "ok",    score: 3, name: "一般", emoji: "😐", col: "var(--m3)", bg: "var(--m3b)", hex: "#E8C468" },
+    { key: "low",   score: 2, name: "低落", emoji: "😔", col: "var(--m2)", bg: "var(--m2b)", hex: "#7EA6D8" },
+    { key: "bad",   score: 1, name: "很差", emoji: "😢", col: "var(--m1)", bg: "var(--m1b)", hex: "#B08BC2" }
+  ];
+  var moodByKey = {};
+  MOODS.forEach(function (m) { moodByKey[m.key] = m; });
+
+  var STORAGE_KEY = "mood-journal-entries-v1";
+  var WEEK = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
+  var selected = null;
+  var entries = load();
+
+  // ---- 存储 ----
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)); }
+    catch (e) {}
+  }
+
+  // ---- 日期工具 ----
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+
+  function fmtDate(dateStr) {
+    var p = dateStr.split("-");
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    var tk = todayKey();
+    if (dateStr === tk) return "今天";
+    var y = new Date(); y.setDate(y.getDate() - 1);
+    if (dateStr === y.getFullYear() + "-" + pad(y.getMonth() + 1) + "-" + pad(y.getDate())) return "昨天";
+    return (d.getMonth() + 1) + "月" + d.getDate() + "日 " + WEEK[d.getDay()];
+  }
+
+  // ---- 渲染:心情选择器 ----
+  var picker = document.getElementById("picker");
+  MOODS.forEach(function (m) {
+    var btn = document.createElement("button");
+    btn.className = "mood";
+    btn.style.setProperty("--bg", m.bg);
+    btn.style.setProperty("--col", m.col);
+    btn.innerHTML = '<span class="face">' + m.emoji + '</span><span class="name">' + m.name + '</span>';
+    btn.addEventListener("click", function () { select(m.key); });
+    picker.appendChild(btn);
+  });
+
+  var saveBtn = document.getElementById("saveBtn");
+  var noteEl = document.getElementById("note");
+  var savedTip = document.getElementById("savedTip");
+
+  function select(key) {
+    selected = key;
+    var m = moodByKey[key];
+    var kids = picker.children;
+    for (var i = 0; i < kids.length; i++) {
+      kids[i].classList.toggle("on", MOODS[i].key === key);
+    }
+    noteEl.style.setProperty("--focus", m.hex);
+    saveBtn.disabled = false;
+    saveBtn.textContent = "保存今天的心情";
+  }
+
+  // ---- 保存 ----
+  saveBtn.addEventListener("click", function () {
+    if (!selected) return;
+    var tk = todayKey();
+    var text = noteEl.value.trim();
+    var existing = null;
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].date === tk) { existing = entries[i]; break; }
+    }
+    if (existing) {
+      existing.mood = selected;
+      existing.text = text;
+      existing.ts = Date.now();
+    } else {
+      entries.push({ date: tk, mood: selected, text: text, ts: Date.now() });
+    }
+    save();
+    render();
+    savedTip.classList.add("show");
+    setTimeout(function () { savedTip.classList.remove("show"); }, 2200);
+  });
+
+  // ---- 渲染:今日已有记录时回填 ----
+  function loadToday() {
+    var tk = todayKey();
+    var mine = null;
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].date === tk) { mine = entries[i]; break; }
+    }
+    var title = document.getElementById("todayTitle");
+    if (mine) {
+      select(mine.mood);
+      noteEl.value = mine.text || "";
+      saveBtn.textContent = "更新今天的心情";
+      title.textContent = "今天记过啦,想改改?";
+    } else {
+      title.textContent = "今天感觉怎么样?";
+    }
+  }
+
+  // ---- 渲染:本月概览 ----
+  function renderOverview() {
+    var strip = document.getElementById("strip");
+    strip.innerHTML = "";
+    var now = new Date();
+    var year = now.getFullYear(), month = now.getMonth();
+    var days = new Date(year, month + 1, 0).getDate();
+    var tk = todayKey();
+
+    var byDate = {};
+    entries.forEach(function (e) { byDate[e.date] = e; });
+
+    var recorded = 0;
+    for (var d = 1; d <= days; d++) {
+      var dk = year + "-" + pad(month + 1) + "-" + pad(d);
+      var cell = document.createElement("div");
+      cell.className = "cell";
+      var e = byDate[dk];
+      if (e) {
+        var m = moodByKey[e.mood];
+        if (m) {
+          cell.style.background = m.hex;
+          cell.classList.add("filled");
+          recorded++;
+        }
+      }
+      if (dk === tk) {
+        cell.classList.add("today");
+        cell.style.color = byDate[dk] ? moodByKey[byDate[dk].mood].hex : "#D8C4B0";
+      }
+      strip.appendChild(cell);
+    }
+    var months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+    document.getElementById("ovStart").textContent = months[month] + "月1日";
+    document.getElementById("ovEnd").textContent = "今天";
+    var sub = document.getElementById("ovSub");
+    if (recorded === 0) sub.textContent = "还没有记录,从今天开始吧";
+    else sub.textContent = "这个月已经记录了 " + recorded + " 天,真棒";
+  }
+
+  // ---- 渲染:历史列表 ----
+  function renderList() {
+    var list = document.getElementById("list");
+    var count = document.getElementById("count");
+    list.innerHTML = "";
+
+    var sorted = entries.slice().sort(function (a, b) {
+      return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
+    });
+
+    count.textContent = sorted.length ? "共 " + sorted.length + " 条" : "";
+
+    if (!sorted.length) {
+      var es = document.createElement("div");
+      es.className = "card empty-state";
+      es.innerHTML =
+        '<div class="emoji">🌱</div>' +
+        '<p class="t1">还没有记录哦</p>' +
+        '<p class="t2">选一个今天的心情,写下一句话<br>你的第一条足迹就在这里长出来</p>';
+      list.appendChild(es);
+      return;
+    }
+
+    sorted.forEach(function (e) {
+      var m = moodByKey[e.mood] || MOODS[2];
+      var row = document.createElement("div");
+      row.className = "entry";
+      var textHtml = e.text
+        ? '<div class="text">' + esc(e.text) + '</div>'
+        : '<div class="text empty">这一天没有留下文字,但心情被记住了</div>';
+      row.innerHTML =
+        '<div class="dot" style="background:' + hexToSoft(m.hex) + '">' + m.emoji + '</div>' +
+        '<div class="body">' +
+          '<div class="meta">' +
+            '<span class="date">' + fmtDate(e.date) + '</span>' +
+            '<span class="tag" style="background:' + hexToSoft(m.hex) + ';color:' + m.hex + '">' + m.name + '</span>' +
+          '</div>' +
+          textHtml +
+        '</div>' +
+        '<button class="del" title="删除" data-date="' + e.date + '">&times;</button>';
+      list.appendChild(row);
+    });
+
+    var dels = list.querySelectorAll(".del");
+    for (var i = 0; i < dels.length; i++) {
+      dels[i].addEventListener("click", function () {
+        var dk = this.getAttribute("data-date");
+        if (!confirm("删除这一天的记录?")) return;
+        entries = entries.filter(function (e) { return e.date !== dk; });
+        save();
+        render();
+        loadToday();
+      });
+    }
+  }
+
+  function hexToSoft(hex) {
+    var r = parseInt(hex.slice(1, 3), 16);
+    var g = parseInt(hex.slice(3, 5), 16);
+    var b = parseInt(hex.slice(5, 7), 16);
+    return "rgba(" + r + "," + g + "," + b + ",0.16)";
+  }
+
+  function esc(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // ---- 问候语 ----
+  function setGreeting() {
+    var h = new Date().getHours();
+    var g = "很高兴又见到你";
+    if (h < 5) g = "夜深了,好好休息";
+    else if (h < 11) g = "早上好,新的一天";
+    else if (h < 14) g = "中午好呀";
+    else if (h < 18) g = "下午好,喝口水吧";
+    else g = "晚上好,今天辛苦了";
+    document.getElementById("greeting").textContent = g;
+    document.getElementById("todayDate").textContent = fmtFullToday();
+  }
+  function fmtFullToday() {
+    var d = new Date();
+    return d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日 " + WEEK[d.getDay()];
+  }
+
+  function render() {
+    renderOverview();
+    renderList();
+  }
+
+  setGreeting();
+  render();
+  loadToday();
+})();
+</script>

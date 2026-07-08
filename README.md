@@ -2,11 +2,26 @@
 
 [English](README.md) | [中文](README.zh.md)
 
-Guide a non-technical person from a raw idea to a working, shippable product — in seven steps, with an AI coding agent.
+You've got an idea for an app. You can't code. Until recently, that was the end of the story.
 
-It ships two ways so almost any agent can use it: a **`SKILL.md`** for Claude Code, and an **`AGENTS.md`** for every tool that reads it (Codex, Cursor, Windsurf, Copilot, Aider, Zed, and 20+ more). Same flow, one source.
+**idea-to-app** is a skill that walks you from that idea to a working, shippable app in seven steps, with an AI agent doing the typing. You make the calls at every step; it does the work. You finish with something real in your hands, plus a folder of docs showing how you got there.
 
-Built for founders, PMs, and beginners who want to **drive** the build — make every decision — while the agent does the typing, and walk away with a real thing plus a full paper trail of docs.
+It runs in Claude Code as a `SKILL.md`, and in every agent that reads `AGENTS.md` — Codex, Cursor, Windsurf, Copilot, Aider, Zed, and 20-odd more. One flow, one source.
+
+## Made by walking the flow
+
+Four small apps, each built start to finish with idea-to-app. All single-file, double-click to run, data kept in the browser.
+
+<table>
+<tr>
+<td align="center" width="25%"><img src="examples/expense-tracker/screenshot.png" width="190"><br><b>记账 · Expense</b><br><sub>A piggy-bank budget app. The pig frowns when you overspend.</sub></td>
+<td align="center" width="25%"><img src="examples/habit-tracker/screenshot.png" width="190"><br><b>打卡 · Habits</b><br><sub>Check in daily, watch the streak light up.</sub></td>
+<td align="center" width="25%"><img src="examples/mood-journal/screenshot.png" width="190"><br><b>心情 · Mood</b><br><sub>One face and one line a day; read your month at a glance.</sub></td>
+<td align="center" width="25%"><img src="examples/pomodoro/screenshot.png" width="190"><br><b>番茄钟 · Focus</b><br><sub>One big ring. 25 minutes. Nothing else.</sub></td>
+</tr>
+</table>
+
+The expense tracker also ships its full paper trail in [`examples/expense-tracker/docs/`](examples/expense-tracker/docs) — the six documents the seven steps produced. Read them top to bottom to see what each step actually yields.
 
 ## The seven steps
 
@@ -20,34 +35,21 @@ Built for founders, PMs, and beginners who want to **drive** the build — make 
 | 6. Build & preview | the app itself |
 | 7. Deploy | `docs/06-deploy.md` |
 
-Every step produces a document, pauses for your sign-off, and can be revisited anytime. Plain language throughout — no jargon.
+Each step writes a document, stops for your OK, and can be reopened later. No jargon anywhere.
 
 ## Install
 
-### Claude Code (as a skill)
+**Claude Code** — clone it into your skills folder, then say "I want to build an app" or run `/idea-to-app`:
 ```bash
 git clone https://github.com/jobsteven/idea-to-app ~/.claude/skills/idea-to-app
 ```
-Then just say "I want to build an app" / "walk me through building X", or run `/idea-to-app`.
-(For one project only, clone into that repo's `.claude/skills/` instead.)
 
-### Codex / Cursor / Windsurf / Copilot / Aider / Zed … (via AGENTS.md)
-These tools natively read `AGENTS.md`. Drop this repo's `AGENTS.md` into your project root (or a global config like `~/.codex/AGENTS.md`):
+**Codex, Cursor, Windsurf, and other AGENTS.md tools** — drop the flow into your project root:
 ```bash
 curl -o AGENTS.md https://raw.githubusercontent.com/jobsteven/idea-to-app/main/AGENTS.md
 ```
-Then tell the agent "build me X from scratch" and it will follow the flow.
 
-### Any other agent
-Copy the contents of `AGENTS.md` into that tool's custom-instructions / rules, or paste it as a prompt when you start a build.
-
-## See it in action
-
-`examples/expense-tracker/` is a real product built by walking this flow end to end:
-- `index.html` — a piggy-bank expense tracker (double-click to run; data persists in the browser).
-- `docs/01`–`06` — the exact documents the seven steps produced along the way.
-
-Read the docs top to bottom to see precisely what each step yields.
+**Anything else** — paste `AGENTS.md` into that tool's custom instructions, or hand it over as a prompt when you start.
 
 ## License
 
