@@ -10,14 +10,15 @@
 
 ## 都是照这套流程做出来的
 
-四个小 App,每个都从头到尾走了一遍 idea-to-app。全是单文件、双击就开、数据存在浏览器里。
+五个小 App,每个都从头到尾走了一遍 idea-to-app。全是单文件、双击就开、数据存在浏览器里。
 
 <table>
 <tr>
 <td align="center" width="25%"><img src="examples/expense-tracker/screenshot.png" width="190"><br><b>记账</b><br><sub>小猪存钱罐记账,超支了小猪会哭</sub></td>
-<td align="center" width="25%"><img src="examples/habit-tracker/screenshot.png" width="190"><br><b>习惯打卡</b><br><sub>每天打卡,连续多少天一眼点亮</sub></td>
 <td align="center" width="25%"><img src="examples/mood-journal/screenshot.png" width="190"><br><b>心情日记</b><br><sub>每天一个表情一句话,月底看情绪起伏</sub></td>
+<td align="center" width="25%"><img src="examples/bullethell/bullethell.png" width="190"><br><b>弹幕游戏</b><br><sub>像素风 Bullethell 小游戏</sub></td>
 <td align="center" width="25%"><img src="examples/pomodoro/screenshot.png" width="190"><br><b>番茄钟</b><br><sub>一个大圈,专注 25 分钟,别的没了</sub></td>
+<td align="center" width="25%"><img src="examples/habit-tracker/screenshot.png" width="190"><br><b>习惯打卡</b><br><sub>每天打卡,连续多少天一眼点亮</sub></td>
 </tr>
 </table>
 
