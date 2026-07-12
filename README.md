@@ -17,8 +17,6 @@ Five small apps, each built start to finish with idea-to-app. All single-file, d
 <td align="center" width="25%"><img src="examples/expense-tracker/screenshot.png" width="190"><br><b>记账 · Expense</b><br><sub>A piggy-bank budget app. The pig frowns when you overspend.</sub></td>
 <td align="center" width="25%"><img src="examples/mood-journal/screenshot.png" width="190"><br><b>心情 · Mood</b><br><sub>One face and one line a day; read your month at a glance.</sub></td>
 <td align="center" width="25%"><img src="examples/bullethell/bullethell.png" width="190"><br><b>弹幕游戏</b><br><sub>像素风 Bullethell 小游戏</sub></td>
-<td align="center" width="25%"><img src="examples/habit-tracker/screenshot.png" width="190"><br><b>打卡 · Habits</b><br><sub>Check in daily, watch the streak light up.</sub></td>
-<td align="center" width="25%"><img src="examples/pomodoro/screenshot.png" width="190"><br><b>番茄钟 · Focus</b><br><sub>One big ring. 25 minutes. Nothing else.</sub></td>
 </tr>
 </table>
 
